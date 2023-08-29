@@ -1,3 +1,5 @@
+#! /srv/rail-lab/flash5/mpatel377/anaconda3/envs/ovr/bin/python
+
 import os
 import copy
 import json
@@ -8,15 +10,19 @@ from PIL import Image, ImageDraw
 from datasets import load_dataset
 import prior
 from ai2thor.controller import Controller
+from ai2thor.platform import CloudRendering
 
 dataset_procthor = prior.load_dataset("procthor-10k")
 
 controller = Controller(scene=dataset_procthor["train"][0],
-                        renderInstanceSegmentation=True)
+                        renderInstanceSegmentation=True,
+                        platform=CloudRendering)
 
 def get_top_down_frame():
     # Setup the top-down camera
-    event = controller.step(action="GetMapViewCameraProperties", raise_for_failure=True)
+    event = controller.step(action="GetMapViewCameraProperties", 
+                            raise_for_failure=True, 
+                            platform=CloudRendering)
     pose = copy.deepcopy(event.metadata["actionReturn"])
 
     bounds = event.metadata["sceneBounds"]["size"]
