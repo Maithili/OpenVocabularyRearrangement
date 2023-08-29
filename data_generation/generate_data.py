@@ -15,14 +15,13 @@ from ai2thor.platform import CloudRendering
 dataset_procthor = prior.load_dataset("procthor-10k")
 
 controller = Controller(scene=dataset_procthor["train"][0],
-                        renderInstanceSegmentation=True,
-                        platform=CloudRendering)
+                        renderInstanceSegmentation=True)
+                        # platform=CloudRendering if CLOUD else None)
 
 def get_top_down_frame():
     # Setup the top-down camera
     event = controller.step(action="GetMapViewCameraProperties", 
-                            raise_for_failure=True, 
-                            platform=CloudRendering)
+                            raise_for_failure=True)
     pose = copy.deepcopy(event.metadata["actionReturn"])
 
     bounds = event.metadata["sceneBounds"]["size"]
@@ -99,7 +98,6 @@ def make_mask(bbox, img_size):
 
 
 for n_house in range(10000):
-    n_house = 1
     house_id = "{:05d}".format(n_house)
     print(f"Processing house {house_id}...")
 
@@ -128,11 +126,12 @@ for n_house in range(10000):
             return (r,g,b)
         else:
             assert False
-        
+  
     os.makedirs(f'data/index', exist_ok=True)
     os.makedirs(f'data/house_images', exist_ok=True)
-    os.makedirs(f'data/images/{house_id}')
-    os.makedirs(f'data/bboxes/{house_id}')
+    os.makedirs(f'data/images/{house_id}', exist_ok=True)
+    os.makedirs(f'data/model/{house_id}', exist_ok=True)
+    os.makedirs(f'data/bboxes/{house_id}', exist_ok=True)
 
     xs = [rp["x"] for rp in reachable_positions]
     zs = [rp["z"] for rp in reachable_positions]
