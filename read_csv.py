@@ -36,12 +36,12 @@ def main(argv):
             name_layout_tuple = row.strip().split(",")
             user_layout_dict[name_layout_tuple[0]]=name_layout_tuple[1]
     for csv_file in csv_files:
-        # Generate random alphanumeric string.
-        anonymized_id = "".join(
-            random.choices(
-                string.ascii_uppercase + string.digits, k=10
-            )
-        )
+        # # Generate random alphanumeric string.
+        # anonymized_id = "".join(
+        #     random.choices(
+        #         string.ascii_uppercase + string.digits, k=10
+        #     )
+        # )
         if csv_file.endswith(".txt"):
             continue
         elif csv_file.endswith(".csv"):
@@ -57,6 +57,8 @@ def main(argv):
                 f"File {csv_file} is neither a .csv or .txt file."
             )
 
+        # TODO: Anonymize.
+        anonymized_id = user_name
         print(f"User {user_name} with anonymized id {anonymized_id}")
         for row_num, row in enumerate(row_list):
             if row_num < 4:
