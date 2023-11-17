@@ -24,6 +24,7 @@ CLIP_EMBEDDINGS_FILE_PATH = "object_data/clip_text_embeddings.pt"
 CLIP_EMBEDDING_DIM = 512
 
 random.seed(3289758934)
+torch.manual_seed(3289758934)
 
 
 def object_placement_to_tensor(
@@ -79,23 +80,6 @@ def generate_batches_from_data(object_surface_tensors, batch_size=16):
     return batches
 
 
-class ZNetwork(nn.Module):
-    def __init__(self) -> None:
-        super().__init__()
-
-        self.fc1 = nn.Linear(1, 100)
-        self.fc2 = nn.Linear(100, 100)
-        self.fc3 = nn.Linear(100, 1)
-        self.relu = nn.ReLU()
-        self.tanh = nn.Tanh()
-
-    def forward(self, z):
-        z = self.relu(self.fc1(z))
-        z = self.relu(self.fc2(z))
-        z = self.tanh(self.fc3(z))
-        return z
-
-
 class MatchingModelWithLatent(nn.Module):
     HIDDEN_DIM_NETWORK = 2048
 
@@ -126,39 +110,43 @@ def train_model(
     learning_rate: float,
     target_ckpt_folder: str = "",
 ):
+    sigmoid_fn = nn.Sigmoid()
+
     # TODO: validation dataset?
-    users = list(train_batches_dict.keys())
-    znetwork_per_user = {user: ZNetwork().cuda() for user in users}
+    list_of_users = list(train_batches_dict.keys())
+    zlatent_per_user = {}
+    for user in list_of_users:
+        zlatent_per_user[user] = torch.tensor([0], dtype=torch.float32).cuda()
+        zlatent_per_user[user].requires_grad = True
+        nn.init.uniform_(zlatent_per_user[user], -1, 1)
+        print(f"Initial z for user {user}: {zlatent_per_user[user]}")
 
     # Initialize the model
     latent_model = MatchingModelWithLatent(
         input_dim=1 + input_object_dimension + 2 * CLIP_EMBEDDING_DIM
     ).cuda()
 
+    train_parameters = [zlatent_per_user[user] for user in list_of_users] + list(
+        latent_model.parameters()
+    )
+
     # Define the loss function and optimizer
     criterion = nn.BCELoss()
-    optimizer_per_user = {
-        user: torch.optim.Adam(
-            list(znetwork_per_user[user].parameters())
-            + list(latent_model.parameters()),
-            lr=learning_rate,
-        )
-        for user in users
-    }
+    optimizer = torch.optim.Adam(train_parameters, lr=learning_rate)
 
     # Train the model
     torch.autograd.set_detect_anomaly(True)
-    num_batches_per_user = [len(train_batches_dict[u]) for u in users]
+    num_batches_per_user = [len(train_batches_dict[u]) for u in list_of_users]
     print(f"Number of batches per user: {num_batches_per_user}")
     for epoch in range(num_epochs):
         for batch_num in range(max(num_batches_per_user)):
-            # TODO: how to train multiple networks using single buffer?
+            optimizer.zero_grad()
             loss_batch_per_user = {}
-            for uid, user in enumerate(users):
+            for uid, user in enumerate(list_of_users):
                 if batch_num >= num_batches_per_user[uid]:
                     continue
                 # Generate model outputs for each user.
-                optimizer_per_user[user].zero_grad()
+                # optimizer_per_user[user].zero_grad()
 
                 object_vec, room_vec, surface_vec, label = train_batches_dict[user][
                     batch_num
@@ -168,27 +156,24 @@ def train_model(
                 surface_vec = surface_vec.cuda()
                 label = label.cuda()
 
-                # Generate the latent vector for each user from uniform
-                # distribution samples.
-                z_input = torch.rand(size=(len(label), 1)).cuda()
-                z_output = znetwork_per_user[user](z_input)
+                zlatent_normalized = sigmoid_fn(zlatent_per_user[user])
+                zlatent_user_repeat = zlatent_normalized.view(1, -1).repeat(
+                    object_vec.shape[0], 1
+                )
                 if batch_num % 10 == 0:
-                    print(f"Mean z for user {user}: {torch.mean(z_output).cpu()}")
-
+                    print(f"Z for user {user}: {zlatent_normalized}")
                 input_vec = torch.concat(
-                    [z_output, object_vec, room_vec, surface_vec], dim=1
+                    [zlatent_user_repeat, object_vec, room_vec, surface_vec], dim=1
                 )
                 pred = latent_model(input_vec).view(-1)
                 loss_batch_per_user[user] = criterion(pred, label)
                 loss_batch_per_user[user].backward()
 
-                optimizer_per_user[user].step()
+            optimizer.step()
 
-                if batch_num % 10 == 0:
-                    print(
-                        "Epoch: {}, Iteration: {}, Loss: {}".format(
-                            epoch, batch_num, [loss_batch_per_user[user]]
-                        )
+            if batch_num % 10 == 0:
+                print(
+                    f"Epoch: {epoch}, Iteration: {batch_num}, Loss: {loss_batch_per_user[user]}"
                     )
 
     # Save the model
