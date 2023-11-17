@@ -77,6 +77,7 @@ def main(argv):
             surfaces = [row[3], row[5], row[7]]
             surfaces = [s.strip(")").strip("(") for s in surfaces]
             i = 1
+            skip = False
             for room, surface in zip(rooms, surfaces):
                 if not room or not surface:
                     continue
@@ -86,17 +87,20 @@ def main(argv):
                     )
                 user_item_dict[f"room_{i}"] = room
                 if surface not in constants.HOME_LAYOUTS[layout_user][room]:
-                    # Custom surface, just use whatever the user says.
                     print(
                         f"Surface {surface} in file {csv_file} does not match constants."
                     )
-                    user_item_dict[f"surface_{i}"] = surface.lower()
+                    # Skip surface names that don't match constants.
+                    skip = True
+                    # # Custom surface, just use whatever the user says.
+                    # user_item_dict[f"surface_{i}"] = surface.lower()
                 else:
                     user_item_dict[f"surface_{i}"] = (
                         constants.HOME_LAYOUTS[layout_user][room][surface]
                     )
                 i += 1
-            data.append(user_item_dict)
+            if not skip:
+                data.append(user_item_dict)
 
         data_dict[anonymized_id] = data
     with open("data.json", "w") as fjson:

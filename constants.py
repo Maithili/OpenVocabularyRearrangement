@@ -11,6 +11,7 @@ KITCHEN_CSV_KEYS = {
         "G": "sink",
         "H": "kitchen counter",
         "I": "stovetop",
+        "Oven": "oven",
     },
     "Y": {
         "A": "top cabinet",
@@ -21,6 +22,7 @@ KITCHEN_CSV_KEYS = {
         "F": "sink",
         "G": "kitchen counter",
         "H": "stovetop",
+        "oven": "oven",
     },
     "Z": {
         "A": "top cabinet",
@@ -32,6 +34,7 @@ KITCHEN_CSV_KEYS = {
         "G": "sink",
         "H": "kitchen counter",
         "I": "stovetop",
+        "oven": "oven",
     }
 }
 
@@ -198,6 +201,15 @@ HOME_LAYOUTS = {
         "Living Room": LIVING_ROOM_CSV_KEYS["X"],
         "Bathroom": BATHROOM_CSV_KEYS["X"],
         "Hallway": HALLWAY_CSV_KEYS["Z"],
+        "Home Office": HOME_OFFICE_CSV_KEYS["Z"],
+        "Bedroom": BEDROOM_CSV_KEYS["Z"],
+        "Garage": GARAGE_CSV_KEYS["X"],
+    },
+    "XYZ": {
+        "Kitchen": KITCHEN_CSV_KEYS["X"],
+        "Living Room": LIVING_ROOM_CSV_KEYS["X"],
+        "Bathroom": BATHROOM_CSV_KEYS["Y"],
+        "Hallway": HALLWAY_CSV_KEYS["Y"],
         "Home Office": HOME_OFFICE_CSV_KEYS["Z"],
         "Bedroom": BEDROOM_CSV_KEYS["Z"],
         "Garage": GARAGE_CSV_KEYS["X"],
