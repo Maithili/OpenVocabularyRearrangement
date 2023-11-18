@@ -31,7 +31,6 @@ CLIP_EMBEDDING_DIM = 512
 
 random.seed(3289758934)
 
-
 def object_placement_to_tensor(
     object_id, room_name, surface_name, tensor_dict, clip_dict
 ):
@@ -168,7 +167,7 @@ def test_model(
         .astype(int)
     )
     predicted_placements_hits3 = [
-        [room_surface_tuples[i] for i in indices]
+        [room_surface_tuples[i] for i in indices[:3]]
         for indices in prediction_indices_hits3
     ]
     prediction_bool_hits3 = []
@@ -178,6 +177,12 @@ def test_model(
             for orr_tuple in ground_truth_list
             if orr_tuple[0] == object_id
         ]
+        # print("Predictions:")
+        # for p in pred_list:
+        #     print(p)
+        # print("Ground truths:")
+        # for gt in ground_truths:
+        #     print(gt)
         prediction_bool_hits3.append(any(pred in ground_truths for pred in pred_list))
     accuracy_hist3 = sum(prediction_bool_hits3) / len(prediction_bool_hits3)
     return accuracy_hits1, accuracy_hist3
@@ -320,9 +325,12 @@ def main(argv):
         }
         print(f"Accuracy for {key}: @1 - {accuracy_hits1}, @3 - {accuracy_hits3}")
 
-    Path("results").mkdir(parents=True, exist_ok=True)
-    with open(f"results/results_{FLAGS.user}.json", "w") as fjson:
-        json.dump(results_dict, fjson)
+    embb_tag = FLAGS.embeddings_file_path.split("/")[-1].split(".")[0]
+    Path(f"results/sansLatentNetwork").mkdir(parents=True, exist_ok=True)
+    with open(
+        f"results/sansLatentNetwork/results_{FLAGS.user}_{embb_tag}.json", "w"
+        ) as fjson:
+        json.dump(results_dict, fjson, indent=4)
 
 
 if __name__ == "__main__":

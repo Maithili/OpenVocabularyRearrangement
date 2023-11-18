@@ -5,7 +5,9 @@ import json
 from pathlib import Path
 import typing
 import random
+import matplotlib.pyplot as plt
 
+import numpy as np
 import torch
 from torch import nn
 from absl import app, flags
@@ -92,7 +94,6 @@ class MatchingModelWithLatent(nn.Module):
         self.fc3 = nn.Linear(self.HIDDEN_DIM_NETWORK, 1)
         # Activation functions.
         self.relu = nn.ReLU()
-        self.tanh = nn.Tanh()
         self.sigmoid = nn.Sigmoid()
 
     def forward(self, x_embb):
@@ -125,28 +126,39 @@ def train_model(
     latent_model = MatchingModelWithLatent(
         input_dim=1 + input_object_dimension + 2 * CLIP_EMBEDDING_DIM
     ).cuda()
-
-    train_parameters = [zlatent_per_user[user] for user in list_of_users] + list(
-        latent_model.parameters()
-    )
-
-    # Define the loss function and optimizer
+    # Define the loss function.
     criterion = nn.BCELoss()
-    optimizer = torch.optim.Adam(train_parameters, lr=learning_rate)
+    # Define the optimizer.
+    train_parameters_shared = list(latent_model.parameters())
+    train_parameters_not_shared = [zlatent_per_user[user] for user in list_of_users]
+    optimizer = torch.optim.Adam(
+            [
+                {"params": train_parameters_shared,
+                 "lr": learning_rate/len(list_of_users),
+                 "weight_decay": 1e-20/len(list_of_users)},
+                {"params": train_parameters_not_shared,
+                 "lr": learning_rate,
+                 "weight_decay": 1e-20},
+            ]
+        )
 
     # Train the model
     torch.autograd.set_detect_anomaly(True)
     num_batches_per_user = [len(train_batches_dict[u]) for u in list_of_users]
     print(f"Number of batches per user: {num_batches_per_user}")
+    loss_history = []
+    prev_loss_per_user = [torch.inf for _ in list_of_users]
+    break_flag = False
     for epoch in range(num_epochs):
+        if break_flag:
+            break
         for batch_num in range(max(num_batches_per_user)):
             optimizer.zero_grad()
             loss_batch_per_user = {}
             for uid, user in enumerate(list_of_users):
                 if batch_num >= num_batches_per_user[uid]:
+                    loss_batch_per_user[user] = None
                     continue
-                # Generate model outputs for each user.
-                # optimizer_per_user[user].zero_grad()
 
                 object_vec, room_vec, surface_vec, label = train_batches_dict[user][
                     batch_num
@@ -170,18 +182,46 @@ def train_model(
                 loss_batch_per_user[user].backward()
 
             optimizer.step()
-
+            current_loss_per_user = [
+                loss_batch_per_user[u].item()
+                for u in list_of_users
+                if loss_batch_per_user[u] is not None
+            ]
+            if all (
+                abs(current_loss_per_user[i] - prev_loss_per_user[i]) < 1e-2
+                for i in range(len(current_loss_per_user))
+            ) and len(current_loss_per_user) == len(list_of_users):
+                print(f"Prev loss: {prev_loss_per_user}")
+                print(f"Current loss: {current_loss_per_user}")
+                print(f"Early stopping at epoch {epoch}, iter {batch_num}.")
+                break_flag = True
+                break
+            for i, user in enumerate(list_of_users):
+                if loss_batch_per_user[user] is not None:
+                    prev_loss_per_user[i] = loss_batch_per_user[user].item()
             if batch_num % 10 == 0:
                 print(
-                    f"Epoch: {epoch}, Iteration: {batch_num}, Loss: {loss_batch_per_user[user]}"
+                    f"Epoch: {epoch}, Iteration: {batch_num}, user {user}, Loss: {prev_loss_per_user}"
                     )
+            loss_history.append(list(prev_loss_per_user))
 
     # Save the model
+    embb_tag = FLAGS.embeddings_file_path.split("/")[-1].split(".")[0]
     torch.save(
         latent_model.state_dict(),
-        os.path.join(target_ckpt_folder, f"model_exclude_{FLAGS.excluded_user}.ckpt"),
+        os.path.join(target_ckpt_folder, f"model_exclude_{FLAGS.excluded_user}_embb_{embb_tag}.ckpt"),
     )
 
+    for i, user in enumerate(list_of_users):
+        loss_history_user = [l[i] for l in loss_history]
+        plt.plot(range(len(loss_history_user)), loss_history_user, label=user)
+    plt.legend()
+    plt.savefig(
+        os.path.join(
+            target_ckpt_folder,
+            f"loss_exclude_{FLAGS.excluded_user}_embb_{embb_tag}.png",
+        )
+    )
 
 def main(argv):
     if len(argv) > 1:
@@ -239,18 +279,18 @@ def main(argv):
             )
 
     user_train_batches = {
-        user: generate_batches_from_data(tensor_list, batch_size=8)
+        user: generate_batches_from_data(tensor_list, batch_size=16)
         for user, tensor_list in user_tensor_data.items()
     }
 
     # Create logs folder and train model.
-    Path("./logs").mkdir(parents=True, exist_ok=True)
+    Path("./logs/sansLatentNetwork").mkdir(parents=True, exist_ok=True)
     train_model(
         user_train_batches,
         input_object_dimension=input_object_dimension,
-        num_epochs=25,
-        learning_rate=1e-4,
-        target_ckpt_folder="./logs",
+        num_epochs=30,
+        learning_rate=5e-4,
+        target_ckpt_folder="./logs/sansLatentNetwork",
     )
 
 

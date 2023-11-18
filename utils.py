@@ -69,7 +69,7 @@ def load_test_data(user_data, object_split, layout_key):
     return object_surface_data_dict
 
 
-def load_train_data(user_data, object_split, layout_key, negative=False):
+def load_train_data(user_data, object_split, layout_key, negative=True):
     # Load train data.
     train_object_ids = (
         object_split["train_memorization"] + object_split["train_others"]
@@ -124,17 +124,9 @@ def load_train_data(user_data, object_split, layout_key, negative=False):
             negative_object_placements.append(
                 [object_id, inroom, random_surface_inroom[0], 0]
             )
-    random.shuffle(positive_object_placements)
-    random.shuffle(negative_object_placements)
-
-    # Alternately add positive and negative samples to a single list.
-    combined_object_placements = []
-    max_len = max(len(positive_object_placements), len(negative_object_placements))
-    for i in range(max_len):
-        if i < len(positive_object_placements):
-            combined_object_placements.append(positive_object_placements[i])
-        if i < len(negative_object_placements):
-            combined_object_placements.append(negative_object_placements[i])
+    # Add positive and negative samples to a single list and shuffle.
+    combined_object_placements = positive_object_placements + negative_object_placements
+    random.shuffle(combined_object_placements)
     return combined_object_placements
 
 
