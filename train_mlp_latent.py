@@ -111,7 +111,7 @@ def train_model(
     learning_rate: float,
     target_ckpt_folder: str = "",
 ):
-    sigmoid_fn = nn.Sigmoid()
+    tanh_function = nn.Tanh()
 
     # TODO: validation dataset?
     list_of_users = list(train_batches_dict.keys())
@@ -168,7 +168,8 @@ def train_model(
                 surface_vec = surface_vec.cuda()
                 label = label.cuda()
 
-                zlatent_normalized = sigmoid_fn(zlatent_per_user[user])
+                # Normalize zlatent to [-1, 1] using tanh.
+                zlatent_normalized = tanh_function(zlatent_per_user[user])
                 zlatent_user_repeat = zlatent_normalized.view(1, -1).repeat(
                     object_vec.shape[0], 1
                 )
