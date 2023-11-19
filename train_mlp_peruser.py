@@ -15,74 +15,70 @@ import torch
 from torch import nn
 
 import constants
+import utils
 
 flags.DEFINE_string("user", None, "Name of the user to train the model for.")
+flags.DEFINE_string(
+    "embeddings_file_path",
+    "object_data/embeddings_saved/CLIP_max_DINO_max.pt",
+    "Path to the embeddings file.",
+)
 
 FLAGS = flags.FLAGS
-INPUT_DIM = 512*3
+
+CLIP_EMBEDDINGS_FILE_PATH = "object_data/clip_text_embeddings.pt"
+CLIP_EMBEDDING_DIM = 512
 
 random.seed(3289758934)
-
-DATETIMESTR = datetime.datetime.now().strftime("%Y_%m_%d_%H%M%S")
-
-def _text_to_clip():
-    """Function to convert text to clip embeddings."""
-
-    # Load the CLIP model
-    device = "cuda" if torch.cuda.is_available() else "cpu"
-    model, _ = clip.load("ViT-B/32", device=device)
-
-    def _generate_clip_text_embeddings(text_inputs):
-        # Encode the text inputs
-        text_embeddings = []
-        for text in text_inputs:
-            text_tensor = clip.tokenize(text).to(device)
-            with torch.no_grad():
-                text_embedding = model.encode_text(text_tensor)
-                text_embeddings.append(text_embedding)
-
-        if len(text_embedding.shape) == 1:
-            text_embeddings = torch.stack(text_embeddings)
-        else:
-            assert text_embedding.shape[0] == 1
-            text_embeddings = torch.cat(text_embeddings, dim=0)
-
-        return text_embeddings
-
-    return _generate_clip_text_embeddings
+torch.manual_seed(3289758934)
 
 
-def _json_object_to_tensor(object_surface_data, batch_size=16):
-    object_names = [d[0] for d in object_surface_data]
-    room_names = [d[1] for d in object_surface_data]
-    surface_names = [d[2] for d in object_surface_data]
+def object_placement_to_tensor(
+    object_id, room_name, surface_name, tensor_dict, clip_dict
+):
+    """Function to convert object id to tensor."""
 
-    clip_generator = _text_to_clip()
-    object_tensors = clip_generator(object_names).to(torch.float32)
-    room_tensors = clip_generator(room_names).to(torch.float32)
-    surface_tensors = clip_generator(surface_names).to(torch.float32)
+    if object_id not in tensor_dict:
+        raise ValueError(f"Object {object_id} not in tensor dict.")
+    if "room_" + room_name not in clip_dict:
+        raise ValueError(f"Room {room_name} not in clip dict.")
+    if "surface_" + surface_name not in clip_dict:
+        raise ValueError(f"Surface {surface_name} not in clip dict.")
 
-    labels_tensor = torch.tensor(
-        [d[3] for d in object_surface_data]
-    ).to(torch.float32).view(-1)
+    object_tensor = tensor_dict[object_id].view(1, -1)
+    room_tensor = clip_dict["room_" + room_name].view(1, -1)
+    surface_tensor = clip_dict["surface_" + surface_name].view(1, -1)
+    return object_tensor, room_tensor, surface_tensor
+
+
+def generate_batches_from_data(object_surface_tensors, batch_size=16):
+    # random.shuffle(object_surface_tensors)
+    object_tensors = [d[0] for d in object_surface_tensors]
+    room_names = [d[1] for d in object_surface_tensors]
+    surface_names = [d[2] for d in object_surface_tensors]
+
+    labels_tensor = (
+        torch.tensor([d[3] for d in object_surface_tensors]).to(torch.float32).view(-1)
+    )
+
     batches = []
 
-    for i in range(0, len(object_surface_data), batch_size):
-        if i + batch_size > len(object_surface_data):
+    for i in range(0, len(object_surface_tensors), batch_size):
+        if i + batch_size > len(object_surface_tensors):
             batches.append(
                 [
-                    object_tensors[i:],
-                    room_tensors[i:],
-                    surface_tensors[i:],
+                    torch.concat(object_tensors[i:], dim=0),
+                    torch.concat(room_names[i:], dim=0),
+                    torch.concat(surface_names[i:], dim=0),
                     labels_tensor[i:],
                 ]
             )
         else:
             batches.append(
                 [
-                    object_tensors[i : i + batch_size],
-                    room_tensors[i : i + batch_size],
-                    surface_tensors[i : i + batch_size],
+                    torch.concat(object_tensors[i : i + batch_size], dim=0),
+                    torch.concat(room_names[i : i + batch_size], dim=0),
+                    torch.concat(surface_names[i : i + batch_size], dim=0),
                     labels_tensor[i : i + batch_size],
                 ]
             )
@@ -92,7 +88,6 @@ def _json_object_to_tensor(object_surface_data, batch_size=16):
 
 class MatchingModelSimple(nn.Module):
     HIDDEN_DIM_NETWORK = 2048
-    OUTPUT_DIM_LATENT = 1
 
     def __init__(self, input_dim=512):
         super().__init__()
@@ -113,49 +108,65 @@ class MatchingModelSimple(nn.Module):
 
 
 def train_model(
-    train_data: typing.List[typing.Any],
+    train_batches: typing.List[typing.Any],
+    input_object_dimension: int,
     num_epochs: int,
     learning_rate: float,
-    model_ckpt: typing.Optional[str] = None,
     target_ckpt_folder: str = "",
 ):
     """Function to train the full MLP model"""
 
     # Initialize the model
-    model = MatchingModelSimple(INPUT_DIM)
-    if model_ckpt is not None:
-        model.load_state_dict(torch.load(model_ckpt))
-    model = model.cuda().float()
+    model = MatchingModelSimple(input_object_dimension + 2*CLIP_EMBEDDING_DIM)
+    model.cuda()
 
     # Define the loss function and optimizer
     criterion = nn.BCELoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+    optimizer = torch.optim.Adam(
+        model.parameters(), lr=learning_rate, weight_decay=1e-20
+    )
 
     # Train the model
     model.train()
+    break_flag = False
+    prev_loss = torch.inf
     for epoch in range(num_epochs):
-        model.train()
-        for i, (object_vec, room_vec, surface_vec, label) in enumerate(train_data):
+        if break_flag:
+            break
+        for batch_num, batch in enumerate(train_batches):
+            optimizer.zero_grad()
+            object_vec, room_vec, surface_vec, label = batch
             object_vec = object_vec.cuda()
             room_vec = room_vec.cuda()
             surface_vec = surface_vec.cuda()
             label = label.cuda()
 
-            optimizer.zero_grad()
             pred = model(torch.concat([object_vec, room_vec, surface_vec], dim=1))
             loss = criterion(pred.view(-1), label)
             loss.backward()
             optimizer.step()
 
-            if i % 15 == 0:
+            # Early stopping.
+            current_loss = loss.item()
+            if abs(current_loss - prev_loss) < 1e-4:
+                print(f"Early stopping at epoch {epoch} and batch {batch_num}.")
+                break_flag = True
+                break
+            prev_loss = float(current_loss)
+
+            if batch_num % 10 == 0:
                 print(
-                    "Epoch: {}, Iteration: {}, Loss: {}".format(epoch, i, loss.item())
+                    "Epoch: {}, Iteration: {}, Loss: {}".format(epoch, batch_num, loss.item())
                 )
 
     # Save the model
+    embb_tag = FLAGS.embeddings_file_path.split("/")[-1].split(".")[0]
     torch.save(
         model.state_dict(),
-        os.path.join(target_ckpt_folder, f"{DATETIMESTR}_{FLAGS.user}_model.pth")
+        os.path.join(
+            target_ckpt_folder,
+            f"model_peruser_{FLAGS.user}_{embb_tag}_model.pth"
+        )
     )
 
 
@@ -169,7 +180,7 @@ def main(argv):
         for row in text_data:
             name_layout_tuple = row.strip().split(",")
             user_layout_dict[name_layout_tuple[0]] = name_layout_tuple[1]
-    LAYOUT = user_layout_dict[FLAGS.user]
+    user_layout = user_layout_dict[FLAGS.user]
 
     with open("object_data/data_splits.json", "r") as fjson:
         object_split = json.load(fjson)
@@ -182,71 +193,42 @@ def main(argv):
     else:
         user_data = all_user_data[FLAGS.user]
 
-    # Load object names.
-    with open("object_data/object_categories_names.csv", "r") as fcsv:
-        object_names_list = csv.DictReader(fcsv)
-        object_names_dict = {}
-        for obj_dict in object_names_list:
-            object_names_dict[obj_dict["ObjectId"]] = obj_dict["CaptionsHandWritten"]
+    with open(FLAGS.embeddings_file_path, "rb") as f:
+        object_tensor_dict = torch.load(f)
+    with open(CLIP_EMBEDDINGS_FILE_PATH, "rb") as f:
+        clip_text_embeddings_dict = torch.load(f)
 
-    # Load train data.
-    train_object_ids = object_split["train_memorization"] + object_split["train_others"]
-    train_object_surface_data = []
-    for obj_dict in user_data:
-        if obj_dict["object_id"] not in train_object_ids:
-            continue
+    input_object_dimension = list(object_tensor_dict.values())[0].shape[-1]
+    print(f"Input object dimension: {input_object_dimension}")
 
-        object_name = object_names_dict[obj_dict["object_id"]]
+    object_surface_tuples = utils.load_train_data(
+        user_data, object_split, user_layout, negative=True
+    )
+    assert not all(t[3] == 1 for t in object_surface_tuples)
 
-        # Add positive samples.
-        positive_rooms_list = []
-        positive_surfaces_list = []
-        for i in range(1, 4):
-            if f"room_{i}" in obj_dict and f"surface_{i}" in obj_dict:
-                train_object_surface_data.append(
-                    [object_name, obj_dict[f"room_{i}"], obj_dict[f"surface_{i}"], 1]
-                )
-                if obj_dict[f"room_{i}"] not in positive_rooms_list:
-                    positive_rooms_list.append(obj_dict[f"room_{i}"])
-                if obj_dict[f"surface_{i}"] not in positive_surfaces_list:
-                    positive_surfaces_list.append(obj_dict[f"surface_{i}"])
-
-        # Select random room and surface for negative samples.
-        # Random room and random surface.
-        excluded_rooms = [
-            r for r in list(constants.HOME_LAYOUTS[LAYOUT].keys()) if r not in positive_rooms_list
-        ]
-        random_room = random.sample(excluded_rooms, 1)[0]
-        random_surface_outroom = random.sample(
-            list(constants.HOME_LAYOUTS[LAYOUT][random_room].values()), 1
+    tensor_data = []
+    for object_id, room_name, surface_name, label in object_surface_tuples:
+        object_tensor, room_tensor, surface_tensor = object_placement_to_tensor(
+            object_id,
+            room_name,
+            surface_name,
+            object_tensor_dict,
+            clip_text_embeddings_dict
         )
-        train_object_surface_data.append(
-            [object_name, random_room, random_surface_outroom[0], 0]
-        )
-        # Correct room, random surface.
-        inroom = random.sample(positive_rooms_list, 1)[0]
-        inroom_negative_surfaces = [
-            s
-            for s in list(constants.HOME_LAYOUTS[LAYOUT][inroom].values())
-            if s not in positive_surfaces_list
-        ]
-        if not inroom_negative_surfaces:
-            continue
-        random_surface_inroom = random.sample(inroom_negative_surfaces, 1)
-        train_object_surface_data.append(
-            [object_name, inroom, random_surface_inroom[0], 0]
+        tensor_data.append(
+            [object_tensor, room_tensor, surface_tensor, label]
         )
 
-    train_batches = _json_object_to_tensor(train_object_surface_data)
+    train_batches = generate_batches_from_data(tensor_data, batch_size=16)
 
     # Create logs folder and train model.
-    Path("./logs").mkdir(parents=True, exist_ok=True)
+    Path("./logs/modelPerUser").mkdir(parents=True, exist_ok=True)
     train_model(
         train_batches,
-        num_epochs=50,
+        input_object_dimension=input_object_dimension,
+        num_epochs=30,
         learning_rate=1e-4,
-        model_ckpt=None,
-        target_ckpt_folder="./logs",
+        target_ckpt_folder="./logs/modelPerUser",
     )
 
 
