@@ -1,13 +1,10 @@
-Cup
-Canned Food
-Dress
-Turkish Coffee Pot
-Necklace
 Handheld Appliance
-Cap
-Speaker
-Coffee Maker
+Cup
+Necklace
 Spatula
+Canned Drink
 Pencil
-Grinder
-Jacket
+Cleaning Liquid
+Canned Food
+Plate
+Pan
