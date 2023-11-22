@@ -108,7 +108,7 @@ class MatchingModelSimple(nn.Module):
 
 
 def train_model(
-    train_batches: typing.List[typing.Any],
+    batches: typing.List[typing.Any],
     input_object_dimension: int,
     num_epochs: int,
     learning_rate: float,
@@ -119,6 +119,10 @@ def train_model(
     # Initialize the model
     model = MatchingModelSimple(input_object_dimension + 2*CLIP_EMBEDDING_DIM)
     model.cuda()
+
+    # TODO: make train and validation exclusive.
+    train_batches = batches
+    validation_batches = batches
 
     # Define the loss function and optimizer
     criterion = nn.BCELoss()
@@ -146,18 +150,25 @@ def train_model(
             loss.backward()
             optimizer.step()
 
-            # Early stopping.
-            current_loss = loss.item()
-            if abs(current_loss - prev_loss) < 1e-4:
-                print(f"Early stopping at epoch {epoch} and batch {batch_num}.")
-                break_flag = True
-                break
-            prev_loss = float(current_loss)
+        val_loss = 0
+        with torch.no_grad():
+            for val_batch in validation_batches:
+                object_vec, room_vec, surface_vec, label = val_batch
+                object_vec = object_vec.cuda()
+                room_vec = room_vec.cuda()
+                surface_vec = surface_vec.cuda()
+                label = label.cuda()
 
-            if batch_num % 10 == 0:
-                print(
-                    "Epoch: {}, Iteration: {}, Loss: {}".format(epoch, batch_num, loss.item())
-                )
+                pred = model(torch.concat([object_vec, room_vec, surface_vec], dim=1))
+                loss = criterion(pred.view(-1), label).detach()
+                val_loss += loss.item()
+        val_loss /= len(validation_batches)
+
+        if abs(val_loss - prev_loss) < 1e-3:
+            print(f"Early stopping at epoch {epoch}.")
+            break
+        prev_loss = float(val_loss)
+        print(f"Epoch: {epoch}, Val Loss: {val_loss}")
 
     # Save the model
     embb_tag = FLAGS.embeddings_file_path.split("/")[-1].split(".")[0]
@@ -226,7 +237,7 @@ def main(argv):
     train_model(
         train_batches,
         input_object_dimension=input_object_dimension,
-        num_epochs=30,
+        num_epochs=500,
         learning_rate=1e-4,
         target_ckpt_folder="./logs/modelPerUser",
     )

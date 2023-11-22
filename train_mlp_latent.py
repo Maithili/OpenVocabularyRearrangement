@@ -105,7 +105,7 @@ class MatchingModelWithLatent(nn.Module):
 
 
 def train_model(
-    train_batches_dict: typing.Dict[str, typing.Any],
+    batches_dict: typing.Dict[str, typing.Any],
     input_object_dimension: int,
     num_epochs: int,
     learning_rate: float,
@@ -113,7 +113,16 @@ def train_model(
 ):
     tanh_function = nn.Tanh()
 
-    # TODO: validation dataset?
+    # TODO: make train and validation exclusive.
+    validation_batches_dict = {
+        user: batches_dict[user]
+        for user in batches_dict
+    }
+    train_batches_dict = {
+        user: batches_dict[user]
+        for user in batches_dict
+    }
+
     list_of_users = list(train_batches_dict.keys())
     zlatent_per_user = {}
     for user in list_of_users:
@@ -128,6 +137,8 @@ def train_model(
     ).cuda()
     # Define the loss function.
     criterion = nn.BCELoss()
+    sum_criterion = nn.BCELoss(reduction="sum")
+
     # Define the optimizer.
     train_parameters_shared = list(latent_model.parameters())
     train_parameters_not_shared = [zlatent_per_user[user] for user in list_of_users]
@@ -148,16 +159,12 @@ def train_model(
     print(f"Number of batches per user: {num_batches_per_user}")
     loss_history = []
     prev_loss_per_user = [torch.inf for _ in list_of_users]
-    break_flag = False
     for epoch in range(num_epochs):
-        if break_flag:
-            break
         for batch_num in range(max(num_batches_per_user)):
             optimizer.zero_grad()
             loss_batch_per_user = {}
             for uid, user in enumerate(list_of_users):
                 if batch_num >= num_batches_per_user[uid]:
-                    loss_batch_per_user[user] = None
                     continue
 
                 object_vec, room_vec, surface_vec, label = train_batches_dict[user][
@@ -173,38 +180,57 @@ def train_model(
                 zlatent_user_repeat = zlatent_normalized.view(1, -1).repeat(
                     object_vec.shape[0], 1
                 )
-                if batch_num % 10 == 0:
-                    print(f"Z for user {user}: {zlatent_normalized}")
                 input_vec = torch.concat(
                     [zlatent_user_repeat, object_vec, room_vec, surface_vec], dim=1
                 )
                 pred = latent_model(input_vec).view(-1)
                 loss_batch_per_user[user] = criterion(pred, label)
                 loss_batch_per_user[user].backward()
-
-            optimizer.step()
-            current_loss_per_user = [
-                loss_batch_per_user[u].item()
-                for u in list_of_users
-                if loss_batch_per_user[u] is not None
-            ]
-            if all (
-                abs(current_loss_per_user[i] - prev_loss_per_user[i]) < 1e-2
-                for i in range(len(current_loss_per_user))
-            ) and len(current_loss_per_user) == len(list_of_users):
-                print(f"Prev loss: {prev_loss_per_user}")
-                print(f"Current loss: {current_loss_per_user}")
-                print(f"Early stopping at epoch {epoch}, iter {batch_num}.")
-                break_flag = True
-                break
-            for i, user in enumerate(list_of_users):
-                if loss_batch_per_user[user] is not None:
-                    prev_loss_per_user[i] = loss_batch_per_user[user].item()
             if batch_num % 10 == 0:
-                print(
-                    f"Epoch: {epoch}, Iteration: {batch_num}, user {user}, Loss: {prev_loss_per_user}"
+                for user in list_of_users:
+                    print(f"Z for user {user}: {zlatent_normalized.item()},\tLoss: {loss_batch_per_user[user].item()}")
+                print("")
+            optimizer.step()
+
+        # Validation step
+        current_val_loss_array = []
+        with torch.no_grad():
+            for uid, user in enumerate(list_of_users):
+                loss_per_user = 0
+                for val_batch in validation_batches_dict[user]:
+                    object_vec, room_vec, surface_vec, label = val_batch
+                    object_vec = object_vec.cuda()
+                    room_vec = room_vec.cuda()
+                    surface_vec = surface_vec.cuda()
+                    label = label.cuda()
+
+                    # Normalize zlatent to [-1, 1] using tanh.
+                    zlatent_normalized = tanh_function(zlatent_per_user[user])
+                    zlatent_user_repeat = zlatent_normalized.view(1, -1).repeat(
+                        object_vec.shape[0], 1
                     )
-            loss_history.append(list(prev_loss_per_user))
+                    input_vec = torch.concat(
+                        [zlatent_user_repeat, object_vec, room_vec, surface_vec],
+                        dim=1,
+                    )
+                    pred = latent_model(input_vec).view(-1)
+                    loss = sum_criterion(pred, label).detach()
+                    loss_per_user += loss.item()
+                current_val_loss_array.append(
+                    loss_per_user/len(validation_batches_dict[user])
+                )
+            if all(
+                abs(current_val_loss_array[uid] - prev_loss_per_user[uid]) < 1e-3
+                for uid in range(len(list_of_users))
+            ):
+                print(f"Early stopping at epoch {epoch} and batch {batch_num}")
+                break
+            prev_loss_per_user = list(current_val_loss_array)
+
+            print(
+                f"Epoch: {epoch}, Iteration: {batch_num}, user {user}\n"
+                f"Val loss: {current_val_loss_array}"
+            )
 
     # Save the model
     embb_tag = FLAGS.embeddings_file_path.split("/")[-1].split(".")[0]
@@ -223,6 +249,7 @@ def train_model(
             f"loss_exclude_{FLAGS.excluded_user}_embb_{embb_tag}.png",
         )
     )
+
 
 def main(argv):
     if len(argv) > 1:
@@ -289,7 +316,7 @@ def main(argv):
     train_model(
         user_train_batches,
         input_object_dimension=input_object_dimension,
-        num_epochs=30,
+        num_epochs=500,
         learning_rate=5e-4,
         target_ckpt_folder="./logs/sansLatentNetwork",
     )
