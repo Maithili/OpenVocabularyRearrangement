@@ -202,7 +202,7 @@ def main(argv):
     with open("object_data/data_splits.json", "r") as fjson:
         object_split = json.load(fjson)
 
-    with open("data.json", "r") as jsonfile:
+    with open("data_filtered.json", "r") as jsonfile:
         all_user_data = json.load(jsonfile)
 
     if FLAGS.user not in all_user_data:
