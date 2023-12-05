@@ -3,6 +3,9 @@ import json
 import numpy as np
 import matplotlib.pyplot as plt
 
+# change matplotlib font size using rcparams.
+plt.rcParams.update({'font.size': 26})
+
 user_layout_dict = {}
 with open("../user_data/user_layout_mapping.txt", "r") as ftxt:
     text_data = ftxt.readlines()
@@ -31,6 +34,7 @@ for row in reader:
 
 # Calculate interesection over union for objects within subcategory per user.
 excluded_subcats = []
+excluded_object_ids = []
 
 user_iou_per_subcat = {}
 for user, user_data in user_data_dict.items():
@@ -64,6 +68,8 @@ for user, user_data in user_data_dict.items():
             if not placements_per_object_id:
                 if subcat not in excluded_subcats:
                     excluded_subcats.append(subcat)
+                if object_id not in excluded_object_ids:
+                    excluded_object_ids.append(object_id)
                 print(f"{user}/{subcat}/{object_id} has 0 placements.")
                 continue
             # print(f"Object ID: {object_id}")
@@ -120,26 +126,26 @@ avg_iou_per_subcat = {k: v for k, v in avg_iou_per_subcat}
 
 for subcat, v in avg_iou_per_subcat.items():
     print(f"{subcat}: {v} +- {std_iou_per_subcat[subcat]}")
-fig, ax = plt.subplots(figsize=(16, 16))
+fig, ax = plt.subplots(figsize=(24, 20))
 ax.bar(
     range(len(avg_iou_per_subcat)), list(avg_iou_per_subcat.values()),
     align='center', #yerr=[std_iou_per_subcat[x] for x in avg_iou_per_subcat]
 )
-ax.set_xticks(range(len(avg_iou_per_subcat)), list(avg_iou_per_subcat.keys()), rotation=90)
+ax.set_xticks(
+    range(len(avg_iou_per_subcat)), list(avg_iou_per_subcat.keys()),
+    rotation=90, fontsize=16
+)
 ax.set_title("Average IOU per subcategory across users")
 plt.savefig("../logs/data_statistics/avg_iou_per_subcat.png")
+
+print(f"Number of subcategories excluded: {len(excluded_subcats)}")
+print(f"Number of object ids excluded: {len(excluded_object_ids)}")
 
 with open("../object_data/memorization_subcats.txt", "w") as fwrite:
     for subcat in avg_iou_per_subcat:
         if avg_iou_per_subcat[subcat] <= 0.7:
             fwrite.write(f"{subcat}\n")
 
-num_object_ids_excluded = 0
 with open("../object_data/excluded_object_ids.txt", "w") as ftxt:
-    for subcat, object_id_list in subcategory_to_object_id.items():
-        if subcat in excluded_subcats:
-            num_object_ids_excluded += len(object_id_list)
-            for object_id in object_id_list:
-                ftxt.write(f"{object_id}\n")
-print(f"Number of subcategories excluded: {len(excluded_subcats)}")
-print(f"Number of object ids excluded: {num_object_ids_excluded}")
+    for object_id in excluded_object_ids:
+        ftxt.write(f"{object_id}\n")
