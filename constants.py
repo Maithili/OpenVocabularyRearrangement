@@ -22,7 +22,7 @@ KITCHEN_CSV_KEYS = {
         "F": "sink",
         "G": "kitchen counter",
         "H": "stovetop",
-        "oven": "oven",
+        "Oven": "oven",
     },
     "Z": {
         "A": "top cabinet",
@@ -34,7 +34,7 @@ KITCHEN_CSV_KEYS = {
         "G": "sink",
         "H": "kitchen counter",
         "I": "stovetop",
-        "oven": "oven",
+        "Oven": "oven",
     }
 }
 
@@ -214,4 +214,105 @@ HOME_LAYOUTS = {
         "Bedroom": BEDROOM_CSV_KEYS["Z"],
         "Garage": GARAGE_CSV_KEYS["X"],
     }
+}
+
+MATCHING_SURFACES_BY_LAYOUT = {
+    "Kitchen": [
+        ["A", "A", "A"],
+        ["B", "B", "B"],
+        ["C", "C", "C"],
+        ["D", "D", "D"],
+        ["F", "E", "F"],
+        ["G", "F", "G"],
+        ["H", "G", "H"],
+        ["I", "H", "I"],
+        ["Oven", "Oven", "Oven"],
+        ],
+    "Living Room": [
+        ["B", "B", None],
+        ["F", "E", "C"],
+        ["D", "A", None],
+    ],
+    "Bathroom": [
+        ["C", "C", "C"],
+        ["B", "B", None],
+    ],
+    "Hallway": [
+        ["D", "B", None],
+        [None, "D", "C"],
+        [None, "A", "E"],
+        ["B", None, "B"],
+    ],
+    "Home Office": [
+        ["B", "A", "A"],
+        ["C", "B", None],
+
+    ],
+    "Bedroom": [],
+}
+
+LAYOUT_TO_INDEX = {
+    "X": {
+        "Kitchen": 0,
+        "Living Room": 0,
+        "Bathroom": 0,
+        "Hallway": 0,
+        "Home Office": 0,
+        "Bedroom": 0,
+        "Garage": 0,
+    },
+    "Y": {
+        "Kitchen": 1,
+        "Living Room": 1,
+        "Bathroom": 1,
+        "Hallway": 1,
+        "Home Office": 1,
+        "Bedroom": 1,
+        "Garage": 1,
+    },
+    "Z": {
+        "Kitchen": 2,
+        "Living Room": 2,
+        "Bathroom": 2,
+        "Hallway": 2,
+        "Home Office": 2,
+        "Bedroom": 2,
+        "Garage": 2,
+    },
+    "XY": {
+        "Kitchen": 0,
+        "Living Room": 0,
+        "Bathroom": 0,
+        "Hallway": 1,
+        "Home Office": 1,
+        "Bedroom": 2,
+        "Garage": 0,
+    },
+    "YZ": {
+        "Kitchen": 1,
+        "Living Room": 1,
+        "Bathroom": 1,
+        "Hallway": 2,
+        "Home Office": 2,
+        "Bedroom": 2,
+        "Garage": 0,
+    },
+    "XZ": {
+        "Kitchen": 0,
+        "Living Room": 0,
+        "Bathroom": 0,
+        "Hallway": 2,
+        "Home Office": 2,
+        "Bedroom": 2,
+        "Garage": 0,
+    },
+    "XYZ": {
+        "Kitchen": 0,
+        "Living Room": 0,
+        "Bathroom": 1,
+        "Hallway": 1,
+        "Home Office": 2,
+        "Bedroom": 2,
+        "Garage": 0,
+    },
 }

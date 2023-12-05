@@ -137,6 +137,15 @@
             "surface_1": "fridge"
         },
         {
+            "object_id": "4a880b382059426b97e0d389f3ef3f35",
+            "room_1": "Living Room",
+            "surface_1": "tv unit top shelves",
+            "room_2": "Hallway",
+            "surface_2": "storage top surface",
+            "room_3": "Home Office",
+            "surface_3": "table top surface"
+        },
+        {
             "object_id": "4b0f32666d1c4fabbb26aa3ced6b36f4",
             "room_1": "Home Office",
             "surface_1": "table top surface",
@@ -163,6 +172,15 @@
             "surface_1": "table top surface",
             "room_2": "Bedroom",
             "surface_2": "nightstand"
+        },
+        {
+            "object_id": "5388f20d16064e1fae2741e1c26c9fa3",
+            "room_1": "Kitchen",
+            "surface_1": "kitchen counter",
+            "room_2": "Living Room",
+            "surface_2": "tv unit top shelves",
+            "room_3": "Living Room",
+            "surface_3": "coffee table"
         },
         {
             "object_id": "54d1cfdc6ae541729754b6f9be0496f7",
@@ -257,6 +275,15 @@
             "surface_2": "stovetop"
         },
         {
+            "object_id": "8587d39f1c404c039eb8df77ef1b8114",
+            "room_1": "Living Room",
+            "surface_1": "tv unit top shelves",
+            "room_2": "Kitchen",
+            "surface_2": "kitchen counter",
+            "room_3": "Living Room",
+            "surface_3": "coffee table"
+        },
+        {
             "object_id": "85ededce157545e68e51fa87768a08cb",
             "room_1": "Kitchen",
             "surface_1": "top drawers",
@@ -299,6 +326,11 @@
             "surface_1": "nightstand"
         },
         {
+            "object_id": "95f1afb745b948fd9bac0908b6546d0c",
+            "room_1": "Kitchen",
+            "surface_1": "top cabinet"
+        },
+        {
             "object_id": "9d02f50339204aceae991da3ae251869",
             "room_1": "Kitchen",
             "surface_1": "kitchen counter"
@@ -324,6 +356,11 @@
             "surface_1": "nightstand"
         },
         {
+            "object_id": "a6e19d641a2642b4b9ddb68b0c5f3c56",
+            "room_1": "Kitchen",
+            "surface_1": "kitchen counter"
+        },
+        {
             "object_id": "a8a34fd220714700b3cb6afbe7c1134e",
             "room_1": "Kitchen",
             "surface_1": "top cabinet",
@@ -341,6 +378,11 @@
             "surface_1": "bottom cabinets",
             "room_2": "Kitchen",
             "surface_2": "stovetop"
+        },
+        {
+            "object_id": "ae34f49d98f64fc5aca4a63959838c30",
+            "room_1": "Kitchen",
+            "surface_1": "kitchen counter"
         },
         {
             "object_id": "b09de807134b49eeb6e752ac2dc4e853",
@@ -421,6 +463,13 @@
             "surface_2": "cupboard",
             "room_3": "Bedroom",
             "surface_3": "top dresser cabinets"
+        },
+        {
+            "object_id": "ca1af864b3f3452b9177b2e2759f439a",
+            "room_1": "Kitchen",
+            "surface_1": "kitchen counter",
+            "room_2": "Kitchen",
+            "surface_2": "bottom cabinets"
         },
         {
             "object_id": "ca544918e2ad41cea0a460ed15a2a7f0",
@@ -753,6 +802,15 @@
             "surface_1": "fridge"
         },
         {
+            "object_id": "4a880b382059426b97e0d389f3ef3f35",
+            "room_1": "Kitchen",
+            "surface_1": "top cabinet",
+            "room_2": "Kitchen",
+            "surface_2": "top drawers",
+            "room_3": "Kitchen",
+            "surface_3": "sink"
+        },
+        {
             "object_id": "4b0f32666d1c4fabbb26aa3ced6b36f4",
             "room_1": "Home Office",
             "surface_1": "desk drawers",
@@ -775,6 +833,11 @@
             "surface_1": "desk drawers",
             "room_2": "Living Room",
             "surface_2": "drawer unit"
+        },
+        {
+            "object_id": "5388f20d16064e1fae2741e1c26c9fa3",
+            "room_1": "Living Room",
+            "surface_1": "drawer unit"
         },
         {
             "object_id": "54d1cfdc6ae541729754b6f9be0496f7",
@@ -883,6 +946,11 @@
             "surface_2": "sink"
         },
         {
+            "object_id": "8587d39f1c404c039eb8df77ef1b8114",
+            "room_1": "Hallway",
+            "surface_1": "storage top surface"
+        },
+        {
             "object_id": "85ededce157545e68e51fa87768a08cb",
             "room_1": "Kitchen",
             "surface_1": "top drawers",
@@ -915,6 +983,13 @@
             "surface_1": "table top surface"
         },
         {
+            "object_id": "95f1afb745b948fd9bac0908b6546d0c",
+            "room_1": "Hallway",
+            "surface_1": "top clear cabinet",
+            "room_2": "Kitchen",
+            "surface_2": "pantry cabinet"
+        },
+        {
             "object_id": "9d02f50339204aceae991da3ae251869",
             "room_1": "Kitchen",
             "surface_1": "kitchen counter"
@@ -942,6 +1017,11 @@
             "surface_2": "desk drawers"
         },
         {
+            "object_id": "a6e19d641a2642b4b9ddb68b0c5f3c56",
+            "room_1": "Kitchen",
+            "surface_1": "kitchen counter"
+        },
+        {
             "object_id": "a8a34fd220714700b3cb6afbe7c1134e",
             "room_1": "Kitchen",
             "surface_1": "top cabinet"
@@ -957,6 +1037,11 @@
             "surface_1": "bottom cabinets",
             "room_2": "Kitchen",
             "surface_2": "sink"
+        },
+        {
+            "object_id": "ae34f49d98f64fc5aca4a63959838c30",
+            "room_1": "Bedroom",
+            "surface_1": "small closet shelves"
         },
         {
             "object_id": "b09de807134b49eeb6e752ac2dc4e853",
@@ -1027,6 +1112,11 @@
             "object_id": "c86aa2d4c24d43749040b7d3ff667f7d",
             "room_1": "Bedroom",
             "surface_1": "bottom dresser drawers"
+        },
+        {
+            "object_id": "ca1af864b3f3452b9177b2e2759f439a",
+            "room_1": "Kitchen",
+            "surface_1": "kitchen counter"
         },
         {
             "object_id": "ca544918e2ad41cea0a460ed15a2a7f0",
@@ -1321,6 +1411,11 @@
             "surface_1": "fridge"
         },
         {
+            "object_id": "4a880b382059426b97e0d389f3ef3f35",
+            "room_1": "Kitchen",
+            "surface_1": "bottom cabinets"
+        },
+        {
             "object_id": "4b0f32666d1c4fabbb26aa3ced6b36f4",
             "room_1": "Living Room",
             "surface_1": "tv unit bottom cabinets"
@@ -1339,6 +1434,13 @@
             "object_id": "51fcdf7e23c445f09cda5724423d1066",
             "room_1": "Living Room",
             "surface_1": "tv unit bottom cabinets"
+        },
+        {
+            "object_id": "5388f20d16064e1fae2741e1c26c9fa3",
+            "room_1": "Living Room",
+            "surface_1": "tv unit surface",
+            "room_2": "Kitchen",
+            "surface_2": "kitchen counter"
         },
         {
             "object_id": "54d1cfdc6ae541729754b6f9be0496f7",
@@ -1433,6 +1535,15 @@
             "surface_1": "bottom cabinets"
         },
         {
+            "object_id": "8587d39f1c404c039eb8df77ef1b8114",
+            "room_1": "Bedroom",
+            "surface_1": "vanity table surface",
+            "room_2": "Living Room",
+            "surface_2": "tv unit surface",
+            "room_3": "Home Office",
+            "surface_3": "table top surface"
+        },
+        {
             "object_id": "85ededce157545e68e51fa87768a08cb",
             "room_1": "Kitchen",
             "surface_1": "kitchen counter",
@@ -1473,6 +1584,13 @@
             "surface_2": "table top surface"
         },
         {
+            "object_id": "95f1afb745b948fd9bac0908b6546d0c",
+            "room_1": "Kitchen",
+            "surface_1": "pantry cabinet",
+            "room_2": "Kitchen",
+            "surface_2": "fridge"
+        },
+        {
             "object_id": "9d02f50339204aceae991da3ae251869",
             "room_1": "Kitchen",
             "surface_1": "kitchen counter"
@@ -1500,6 +1618,11 @@
             "surface_1": "top drawers"
         },
         {
+            "object_id": "a6e19d641a2642b4b9ddb68b0c5f3c56",
+            "room_1": "Kitchen",
+            "surface_1": "kitchen counter"
+        },
+        {
             "object_id": "a8a34fd220714700b3cb6afbe7c1134e",
             "room_1": "Kitchen",
             "surface_1": "top cabinet",
@@ -1517,6 +1640,13 @@
             "object_id": "ad93241454534401a44bc18597125e25",
             "room_1": "Kitchen",
             "surface_1": "bottom cabinets"
+        },
+        {
+            "object_id": "ae34f49d98f64fc5aca4a63959838c30",
+            "room_1": "Kitchen",
+            "surface_1": "kitchen counter",
+            "room_2": "Kitchen",
+            "surface_2": "pantry cabinet"
         },
         {
             "object_id": "b09de807134b49eeb6e752ac2dc4e853",
@@ -1587,6 +1717,13 @@
             "object_id": "c86aa2d4c24d43749040b7d3ff667f7d",
             "room_1": "Bedroom",
             "surface_1": "small closet shelves"
+        },
+        {
+            "object_id": "ca1af864b3f3452b9177b2e2759f439a",
+            "room_1": "Kitchen",
+            "surface_1": "kitchen counter",
+            "room_2": "Kitchen",
+            "surface_2": "pantry cabinet"
         },
         {
             "object_id": "ca544918e2ad41cea0a460ed15a2a7f0",
@@ -1903,6 +2040,15 @@
             "surface_1": "fridge"
         },
         {
+            "object_id": "4a880b382059426b97e0d389f3ef3f35",
+            "room_1": "Kitchen",
+            "surface_1": "top cabinet",
+            "room_2": "Hallway",
+            "surface_2": "top clear cabinet",
+            "room_3": "Hallway",
+            "surface_3": "bottom clear cabinet"
+        },
+        {
             "object_id": "4b0f32666d1c4fabbb26aa3ced6b36f4",
             "room_1": "Home Office",
             "surface_1": "table top surface",
@@ -1931,6 +2077,13 @@
             "surface_2": "tv unit top shelves",
             "room_3": "Living Room",
             "surface_3": "tv unit surface"
+        },
+        {
+            "object_id": "5388f20d16064e1fae2741e1c26c9fa3",
+            "room_1": "Living Room",
+            "surface_1": "tv unit top shelves",
+            "room_2": "Living Room",
+            "surface_2": "tv unit surface"
         },
         {
             "object_id": "54d1cfdc6ae541729754b6f9be0496f7",
@@ -2033,6 +2186,13 @@
             "surface_2": "top cabinet"
         },
         {
+            "object_id": "8587d39f1c404c039eb8df77ef1b8114",
+            "room_1": "Living Room",
+            "surface_1": "tv unit top shelves",
+            "room_2": "Living Room",
+            "surface_2": "tv unit surface"
+        },
+        {
             "object_id": "85ededce157545e68e51fa87768a08cb",
             "room_1": "Kitchen",
             "surface_1": "top drawers"
@@ -2069,6 +2229,11 @@
             "surface_2": "coffee table"
         },
         {
+            "object_id": "95f1afb745b948fd9bac0908b6546d0c",
+            "room_1": "Kitchen",
+            "surface_1": "fridge"
+        },
+        {
             "object_id": "9d02f50339204aceae991da3ae251869",
             "room_1": "Kitchen",
             "surface_1": "kitchen counter",
@@ -2100,6 +2265,13 @@
             "surface_1": "top drawers"
         },
         {
+            "object_id": "a6e19d641a2642b4b9ddb68b0c5f3c56",
+            "room_1": "Kitchen",
+            "surface_1": "kitchen counter",
+            "room_2": "Hallway",
+            "surface_2": "storage top surface"
+        },
+        {
             "object_id": "a8a34fd220714700b3cb6afbe7c1134e",
             "room_1": "Kitchen",
             "surface_1": "pantry cabinet",
@@ -2119,6 +2291,13 @@
             "surface_1": "bottom cabinets",
             "room_2": "Kitchen",
             "surface_2": "top cabinet"
+        },
+        {
+            "object_id": "ae34f49d98f64fc5aca4a63959838c30",
+            "room_1": "Kitchen",
+            "surface_1": "kitchen counter",
+            "room_2": "Hallway",
+            "surface_2": "storage top surface"
         },
         {
             "object_id": "b09de807134b49eeb6e752ac2dc4e853",
@@ -2189,6 +2368,13 @@
             "object_id": "c86aa2d4c24d43749040b7d3ff667f7d",
             "room_1": "Bedroom",
             "surface_1": "small closet shelves"
+        },
+        {
+            "object_id": "ca1af864b3f3452b9177b2e2759f439a",
+            "room_1": "Kitchen",
+            "surface_1": "kitchen counter",
+            "room_2": "Hallway",
+            "surface_2": "storage top surface"
         },
         {
             "object_id": "ca544918e2ad41cea0a460ed15a2a7f0",
@@ -2475,6 +2661,11 @@
             "surface_1": "fridge"
         },
         {
+            "object_id": "4a880b382059426b97e0d389f3ef3f35",
+            "room_1": "Kitchen",
+            "surface_1": "cabinets under the island kitchen"
+        },
+        {
             "object_id": "4b0f32666d1c4fabbb26aa3ced6b36f4",
             "room_1": "Home Office",
             "surface_1": "side desk drawers"
@@ -2493,6 +2684,11 @@
             "object_id": "51fcdf7e23c445f09cda5724423d1066",
             "room_1": "Home Office",
             "surface_1": "side desk drawers"
+        },
+        {
+            "object_id": "5388f20d16064e1fae2741e1c26c9fa3",
+            "room_1": "Living Room",
+            "surface_1": "tv unit surface"
         },
         {
             "object_id": "54d1cfdc6ae541729754b6f9be0496f7",
@@ -2575,6 +2771,11 @@
             "surface_1": "bottom cabinets"
         },
         {
+            "object_id": "8587d39f1c404c039eb8df77ef1b8114",
+            "room_1": "Living Room",
+            "surface_1": "tv unit shelves"
+        },
+        {
             "object_id": "85ededce157545e68e51fa87768a08cb",
             "room_1": "Kitchen",
             "surface_1": "top drawers"
@@ -2605,6 +2806,11 @@
             "surface_1": "nightstand"
         },
         {
+            "object_id": "95f1afb745b948fd9bac0908b6546d0c",
+            "room_1": "Hallway",
+            "surface_1": "small cabinet"
+        },
+        {
             "object_id": "9d02f50339204aceae991da3ae251869",
             "room_1": "Kitchen",
             "surface_1": "top drawers"
@@ -2630,6 +2836,11 @@
             "surface_1": "cupboard"
         },
         {
+            "object_id": "a6e19d641a2642b4b9ddb68b0c5f3c56",
+            "room_1": "Kitchen",
+            "surface_1": "cabinets under the island kitchen"
+        },
+        {
             "object_id": "a8a34fd220714700b3cb6afbe7c1134e",
             "room_1": "Kitchen",
             "surface_1": "top cabinet"
@@ -2641,6 +2852,11 @@
         },
         {
             "object_id": "ad93241454534401a44bc18597125e25",
+            "room_1": "Kitchen",
+            "surface_1": "bottom cabinets"
+        },
+        {
+            "object_id": "ae34f49d98f64fc5aca4a63959838c30",
             "room_1": "Kitchen",
             "surface_1": "bottom cabinets"
         },
@@ -2703,6 +2919,11 @@
             "object_id": "c86aa2d4c24d43749040b7d3ff667f7d",
             "room_1": "Hallway",
             "surface_1": "large cabinet"
+        },
+        {
+            "object_id": "ca1af864b3f3452b9177b2e2759f439a",
+            "room_1": "Living Room",
+            "surface_1": "tv unit bottom cabinets"
         },
         {
             "object_id": "ca544918e2ad41cea0a460ed15a2a7f0",
@@ -3003,6 +3224,11 @@
             "surface_2": "kitchen counter"
         },
         {
+            "object_id": "4a880b382059426b97e0d389f3ef3f35",
+            "room_1": "Kitchen",
+            "surface_1": "bottom cabinets"
+        },
+        {
             "object_id": "4b0f32666d1c4fabbb26aa3ced6b36f4",
             "room_1": "Bedroom",
             "surface_1": "wardrobe organizer",
@@ -3033,6 +3259,11 @@
             "surface_2": "small closet shelves",
             "room_3": "Bedroom",
             "surface_3": "top hanger rod"
+        },
+        {
+            "object_id": "5388f20d16064e1fae2741e1c26c9fa3",
+            "room_1": "Kitchen",
+            "surface_1": "kitchen counter"
         },
         {
             "object_id": "54d1cfdc6ae541729754b6f9be0496f7",
@@ -3145,6 +3376,15 @@
             "surface_3": "bottom cabinets"
         },
         {
+            "object_id": "8587d39f1c404c039eb8df77ef1b8114",
+            "room_1": "Living Room",
+            "surface_1": "tv unit shelves",
+            "room_2": "Living Room",
+            "surface_2": "tv unit surface",
+            "room_3": "Kitchen",
+            "surface_3": "kitchen counter"
+        },
+        {
             "object_id": "85ededce157545e68e51fa87768a08cb",
             "room_1": "Kitchen",
             "surface_1": "top drawers",
@@ -3197,6 +3437,15 @@
             "surface_3": "small closet shelves"
         },
         {
+            "object_id": "95f1afb745b948fd9bac0908b6546d0c",
+            "room_1": "Hallway",
+            "surface_1": "small shelves",
+            "room_2": "Kitchen",
+            "surface_2": "kitchen counter",
+            "room_3": "Kitchen",
+            "surface_3": "fridge"
+        },
+        {
             "object_id": "9d02f50339204aceae991da3ae251869",
             "room_1": "Kitchen",
             "surface_1": "kitchen counter"
@@ -3234,6 +3483,11 @@
             "surface_3": "tv unit bottom drawers"
         },
         {
+            "object_id": "a6e19d641a2642b4b9ddb68b0c5f3c56",
+            "room_1": "Kitchen",
+            "surface_1": "kitchen counter"
+        },
+        {
             "object_id": "a8a34fd220714700b3cb6afbe7c1134e",
             "room_1": "Kitchen",
             "surface_1": "top cabinet",
@@ -3257,6 +3511,11 @@
             "surface_2": "bottom cabinets",
             "room_3": "Kitchen",
             "surface_3": "oven"
+        },
+        {
+            "object_id": "ae34f49d98f64fc5aca4a63959838c30",
+            "room_1": "Kitchen",
+            "surface_1": "kitchen counter"
         },
         {
             "object_id": "b09de807134b49eeb6e752ac2dc4e853",
@@ -3345,6 +3604,11 @@
             "object_id": "c86aa2d4c24d43749040b7d3ff667f7d",
             "room_1": "Bedroom",
             "surface_1": "wardrobe organizer"
+        },
+        {
+            "object_id": "ca1af864b3f3452b9177b2e2759f439a",
+            "room_1": "Kitchen",
+            "surface_1": "fridge"
         },
         {
             "object_id": "ca544918e2ad41cea0a460ed15a2a7f0",
