@@ -6,6 +6,7 @@ import datetime
 import json
 from pathlib import Path
 from absl import app, flags
+import matplotlib.pyplot as plt
 
 import random
 import typing
@@ -134,6 +135,7 @@ def train_model(
     model.train()
     break_flag = False
     prev_loss = torch.inf
+    loss_history = []
     for epoch in range(num_epochs):
         if break_flag:
             break
@@ -147,6 +149,7 @@ def train_model(
 
             pred = model(torch.concat([object_vec, room_vec, surface_vec], dim=1))
             loss = criterion(pred.view(-1), label)
+            loss_history.append(loss.item())
             loss.backward()
             optimizer.step()
 
@@ -164,7 +167,7 @@ def train_model(
                 val_loss += loss.item()
         val_loss /= len(validation_batches)
 
-        if abs(val_loss - prev_loss) < 1e-3:
+        if abs(val_loss - prev_loss) < 1e-5:
             print(f"Early stopping at epoch {epoch}.")
             break
         prev_loss = float(val_loss)
@@ -180,6 +183,14 @@ def train_model(
         )
     )
 
+    # Save the loss history.
+    plt.plot(range(len(loss_history)), loss_history)
+    plt.savefig(
+        os.path.join(
+            target_ckpt_folder,
+            f"loss_peruser_{FLAGS.user}_{embb_tag}.png"
+        )
+    )
 
 def main(argv):
     if len(argv) > 1:

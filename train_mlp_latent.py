@@ -186,6 +186,7 @@ def train_model(
                 pred = latent_model(input_vec).view(-1)
                 loss_batch_per_user[user] = criterion(pred, label)
                 loss_batch_per_user[user].backward()
+            loss_history.append([z.item() for z in loss_batch_per_user.values()])
             if batch_num % 10 == 0:
                 for user in list_of_users:
                     print(f"Z for user {user}: {zlatent_normalized.item()},\tLoss: {loss_batch_per_user[user].item()}")
